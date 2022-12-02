@@ -22,18 +22,17 @@
         };
       in
         with pkgs; {
+          programs.zsh = {
+            enable = true;
+            enableCompletion = true;
+          };
           devShells.default = mkShell {
             buildInputs = [
               openssl
               pkg-config
               (rust-bin.selectLatestNightlyWith
                 (toolchain: toolchain.default)) # or `toolchain.minimal`
-              zsh
             ];
-
-            shellHook = ''
-              exec zsh
-            '';
           };
         }
     );
