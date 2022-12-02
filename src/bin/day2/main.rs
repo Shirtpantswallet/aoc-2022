@@ -8,19 +8,18 @@ enum HandShape {
 }
 
 struct Round {
-    own: HandShape,
     opponent: HandShape,
+    own: HandShape,
 }
 
 impl Round {
-    fn new(own: &HandShape, opponent: &HandShape) -> Self {
+    fn new(opponent: &HandShape, own: &HandShape) -> Self {
         Self {
-            own: own.clone(),
             opponent: opponent.clone(),
+            own: own.clone(),
         }
     }
     fn from_line(line: &str) -> Option<Self> {
-        println!("{}", line);
         let pair = line
             .split(" ")
             .filter_map(|c| match c {
@@ -31,7 +30,22 @@ impl Round {
             })
             .collect::<Vec<HandShape>>();
         match pair.as_slice() {
-            [opponent, own] => Some(Self::new(own, opponent)),
+            [opponent, own] => Some(Self::new(opponent, own)),
+            _ => None,
+        }
+    }
+    fn from_line_part_2(line: &str) -> Option<Self> {
+        let pair = line.split(" ").collect::<Vec<&str>>();
+        match pair.as_slice() {
+            ["A", "X"] => Some(Self::new(&HandShape::Rock, &HandShape::Scissors)), // 1 + 0
+            ["C", "X"] => Some(Self::new(&HandShape::Scissors, &HandShape::Paper)), // 2 + 0
+            ["B", "X"] => Some(Self::new(&HandShape::Paper, &HandShape::Rock)),    // 3 + 0
+            ["A", "Y"] => Some(Self::new(&HandShape::Rock, &HandShape::Rock)),     // 1 + 3
+            ["C", "Y"] => Some(Self::new(&HandShape::Scissors, &HandShape::Scissors)), // 2 + 3
+            ["B", "Y"] => Some(Self::new(&HandShape::Paper, &HandShape::Paper)),   // 3 + 3
+            ["A", "Z"] => Some(Self::new(&HandShape::Rock, &HandShape::Paper)),    // 1 + 6
+            ["C", "Z"] => Some(Self::new(&HandShape::Scissors, &HandShape::Rock)), // 2 + 6
+            ["B", "Z"] => Some(Self::new(&HandShape::Paper, &HandShape::Scissors)), // 3 + 6
             _ => None,
         }
     }
@@ -59,7 +73,7 @@ fn main() {
     let contents = fs::read_to_string("./src/bin/day2/input.txt")
         .expect("Should have been able to read the file");
 
-    let final_score: usize = contents
+    let final_score_1: usize = contents
         .lines()
         .into_iter()
         .map(|l| match Round::from_line(l) {
@@ -69,5 +83,5 @@ fn main() {
         .sum();
 
     println!("Part 1:");
-    println!("Final score: {final_score}");
+    println!("Final score: {final_score_1}");
 }
