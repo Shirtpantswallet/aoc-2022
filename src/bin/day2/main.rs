@@ -82,6 +82,16 @@ fn main() {
         })
         .sum();
 
+    let final_score_2: usize = contents
+        .lines()
+        .into_iter()
+        .map(|l| match Round::from_line_part_2(l) {
+            Some(round) => round.calculate_points(),
+            None => 0,
+        })
+        .sum();
     println!("Part 1:");
     println!("Final score: {final_score_1}");
+    println!("Part 2:");
+    println!("Final score: {final_score_2}");
 }
