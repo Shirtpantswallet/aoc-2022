@@ -2,7 +2,7 @@
 use std::fs;
 
 // static CONTENTS: &str = include_str!("input.txt");
-#[target_feature(enable = "avx2")]
+// #[target_feature(enable = "avx2")]
 pub unsafe fn compartments_from_str(line: &str) -> [usize; 2] {
     let middle = line.len() / 2;
 
