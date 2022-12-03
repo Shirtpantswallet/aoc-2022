@@ -2,7 +2,8 @@
 use std::fs;
 
 // static CONTENTS: &str = include_str!("input.txt");
-pub fn compartments_from_str(line: &str) -> [usize; 2] {
+#[target_feature(enable = "avx2")]
+pub unsafe fn compartments_from_str(line: &str) -> [usize; 2] {
     let wonky_remapper = vec![
         27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
         50, 51, 52, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
@@ -30,7 +31,7 @@ fn main() {
 
         let (part_1, part_2) = contents
             .split_whitespace()
-            .map(|r| compartments_from_str(r))
+            .map(|r| unsafe { compartments_from_str(r) })
             .collect::<Vec<_>>()
             .array_chunks_mut::<3>()
             .map(|v| {
