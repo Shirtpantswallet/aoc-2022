@@ -2,8 +2,7 @@
 use std::fs;
 
 // static CONTENTS: &str = include_str!("input.txt");
-// #[target_feature(enable = "avx2")]
-pub unsafe fn compartments_from_str(line: &str) -> [usize; 2] {
+pub fn compartments_from_str(line: &str) -> [usize; 2] {
     let middle = line.len() / 2;
 
     let mut values = line.chars().map(|c| {
@@ -15,12 +14,13 @@ pub unsafe fn compartments_from_str(line: &str) -> [usize; 2] {
         }
     });
 
-    let compartment_1 = values
-        .by_ref()
-        .take(middle)
-        .fold(0, |acc, x| acc | (1 << x));
-    let compartment_2 = values.fold(0, |acc, x| acc | (1 << x));
-    [compartment_1, compartment_2]
+    [
+        values
+            .by_ref()
+            .take(middle)
+            .fold(0, |acc, x| acc | (1 << x)),
+        values.fold(0, |acc, x| acc | (1 << x)),
+    ]
 }
 
 fn main() {
@@ -30,7 +30,7 @@ fn main() {
 
         let (part_1, part_2) = contents
             .split_whitespace()
-            .map(|r| unsafe { compartments_from_str(r) })
+            .map(|r| compartments_from_str(r))
             .collect::<Vec<_>>()
             .array_chunks_mut::<3>()
             .map(|v| {
