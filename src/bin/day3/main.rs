@@ -24,36 +24,34 @@ pub fn compartments_from_str(line: &str) -> [usize; 2] {
 }
 
 fn main() {
-    for _ in 0..10000 {
-        // let contents = fs::read_to_string("./src/bin/day3/input.txt")
-        //     .expect("Should have been able to read the file");
+    // let contents = fs::read_to_string("./src/bin/day3/input.txt")
+    //     .expect("Should have been able to read the file");
 
-        let (part_1, part_2) = CONTENTS
-            .split_whitespace()
-            .map(|r| compartments_from_str(r))
-            .collect::<Vec<_>>()
-            .array_chunks_mut::<3>()
-            .map(|v| {
-                let item_value_sum_3: usize = v
-                    .iter()
-                    .map(|r| {
-                        let mask = r[0] & r[1];
-                        mask.ilog2() as usize
-                    })
-                    .sum();
+    let (part_1, part_2) = CONTENTS
+        .split_whitespace()
+        .map(|r| compartments_from_str(r))
+        .collect::<Vec<_>>()
+        .array_chunks_mut::<3>()
+        .map(|v| {
+            let item_value_sum_3: usize = v
+                .iter()
+                .map(|r| {
+                    let mask = r[0] & r[1];
+                    mask.ilog2() as usize
+                })
+                .sum();
 
-                let badge_value_sum = v
-                    .iter()
-                    .map(|r| r[0] | r[1])
-                    .reduce(|acc, r| acc & r)
-                    .unwrap()
-                    .ilog2() as usize;
-                (item_value_sum_3, badge_value_sum)
-            })
-            .fold((0, 0), |(acc_item, acc_badge), (items, badge)| {
-                (acc_item + items, acc_badge + badge)
-            });
-        println!("Part 1: {:#?}", part_1);
-        println!("Part 2: {:#?}", part_2);
-    }
+            let badge_value_sum = v
+                .iter()
+                .map(|r| r[0] | r[1])
+                .reduce(|acc, r| acc & r)
+                .unwrap()
+                .ilog2() as usize;
+            (item_value_sum_3, badge_value_sum)
+        })
+        .fold((0, 0), |(acc_item, acc_badge), (items, badge)| {
+            (acc_item + items, acc_badge + badge)
+        });
+    println!("Part 1: {:#?}", part_1);
+    println!("Part 2: {:#?}", part_2);
 }
