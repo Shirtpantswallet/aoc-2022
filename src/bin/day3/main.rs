@@ -4,23 +4,29 @@ use std::fs;
 // static CONTENTS: &str = include_str!("input.txt");
 #[target_feature(enable = "avx2")]
 pub unsafe fn compartments_from_str(line: &str) -> [usize; 2] {
-    let wonky_remapper = vec![
-        27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49,
-        50, 51, 52, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
-        18, 19, 20, 21, 22, 23, 24, 25, 26,
-    ];
-
-    let mut compartment_1 = 0;
-    let mut compartment_2 = 0;
-
     let (first_half, second_half) = line.split_at(line.len() / 2);
-
-    for index in first_half.chars().map(|c| wonky_remapper[c as usize - 65]) {
-        compartment_1 = compartment_1 | 1 << index;
-    }
-    for index in second_half.chars().map(|c| wonky_remapper[c as usize - 65]) {
-        compartment_2 = compartment_2 | 1 << index;
-    }
+    let compartment_1 = first_half
+        .chars()
+        .map(|c| {
+            let c = c as usize;
+            if c > 90 {
+                c - 96 // 'a' is Ordinal 97
+            } else {
+                c - 38 // 'A' is ordinal 65, but needs to be remapped to 27. 65 - 27 = 38
+            }
+        })
+        .fold(0, |acc, x| acc | (1 << x));
+    let compartment_2 = second_half
+        .chars()
+        .map(|c| {
+            let c = c as usize;
+            if c > 90 {
+                c - 96 // 'a' is Ordinal 97
+            } else {
+                c - 38 // 'A' is ordinal 65, but needs to be remapped to 27. 65 - 27 = 38
+            }
+        })
+        .fold(0, |acc, x| acc | (1 << x));
     [compartment_1, compartment_2]
 }
 
