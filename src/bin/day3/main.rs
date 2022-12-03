@@ -4,29 +4,22 @@ use std::fs;
 // static CONTENTS: &str = include_str!("input.txt");
 #[target_feature(enable = "avx2")]
 pub unsafe fn compartments_from_str(line: &str) -> [usize; 2] {
-    let (first_half, second_half) = line.split_at(line.len() / 2);
-    let compartment_1 = first_half
-        .chars()
-        .map(|c| {
-            let c = c as usize;
-            if c > 90 {
-                c - 96 // 'a' is Ordinal 97
-            } else {
-                c - 38 // 'A' is ordinal 65, but needs to be remapped to 27. 65 - 27 = 38
-            }
-        })
+    let middle = line.len() / 2;
+
+    let mut values = line.chars().map(|c| {
+        let c = c as usize;
+        if c > 90 {
+            c - 96 // 'a' is Ordinal 97
+        } else {
+            c - 38 // 'A' is ordinal 65, but needs to be remapped to 27. 65 - 27 = 38
+        }
+    });
+
+    let compartment_1 = values
+        .by_ref()
+        .take(middle)
         .fold(0, |acc, x| acc | (1 << x));
-    let compartment_2 = second_half
-        .chars()
-        .map(|c| {
-            let c = c as usize;
-            if c > 90 {
-                c - 96 // 'a' is Ordinal 97
-            } else {
-                c - 38 // 'A' is ordinal 65, but needs to be remapped to 27. 65 - 27 = 38
-            }
-        })
-        .fold(0, |acc, x| acc | (1 << x));
+    let compartment_2 = values.fold(0, |acc, x| acc | (1 << x));
     [compartment_1, compartment_2]
 }
 
