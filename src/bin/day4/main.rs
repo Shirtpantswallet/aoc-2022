@@ -15,9 +15,12 @@ fn main() {
         .map(|bound| bound.parse::<usize>().unwrap())
         .array_chunks::<4>()
         .map(|v| {
-            if v[1] < v[2] || v[0] > v[3] {
+            let [left_low, left_high, right_low, right_high] = v;
+            if left_high < right_low || left_low > right_high {
                 RangeOverlap::None
-            } else if (v[0] > v[2] && v[1] > v[3]) || (v[0] < v[2] && v[1] < v[3]) {
+            } else if (left_low > right_low && left_high > right_high)
+                || (left_low < right_low && left_high < right_high)
+            {
                 RangeOverlap::Intersection
             } else {
                 RangeOverlap::Contained
