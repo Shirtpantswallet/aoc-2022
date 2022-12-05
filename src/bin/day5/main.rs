@@ -37,7 +37,10 @@ fn main() {
         });
     println!("{:?}", stacks);
 
-    let _instructions = input
+    // Although the instructions are the same for parts 1 and 2,
+    // the interpretation is different for each. At least we can
+    // loop through them all at once!
+    let instructions = input
         .flat_map(|line| {
             // Skip "move", then take \d+, skip "from", take \d+, skip 2, and take final \d+
             line.split_whitespace()
@@ -45,20 +48,38 @@ fn main() {
                 .step_by(2)
                 .map(|c| c.parse::<usize>().unwrap())
         }) // Consume [count, source, destination] at a time
-        .array_chunks::<3>()
-        .for_each(|[count, source, destination]| {
-            // println!("moving {count} from  {source} to {destination}");
-            for _ in 0..count {
-                if let Some(container) = stacks[source - 1].pop_back() {
-                    stacks[destination - 1].push_back(container);
-                } else {
-                    break;
-                }
+        .array_chunks::<3>();
+
+    // I don't think there's a way to mutate them both without cloning
+    let mut stacks_part_1 = stacks.clone();
+
+    instructions.for_each(|[count, source, destination]| {
+        let mut temp = VecDeque::new();
+        // I tried drain(count..) as an alternative, but it panics a lot
+        // let mut fofi_containers = stacks_part_1[source - 1].drain(count..).collect();
+        // stacks_part_1[destination - 1].append(&mut fofi_containers);
+
+        // let mut same_order_containers = stacks[source - 1].drain(count..).collect();
+        // stacks[destination - 1].append(&mut same_order_containers);
+
+        for _ in 0..count {
+            if let Some(container) = stacks_part_1[source - 1].pop_back() {
+                stacks_part_1[destination - 1].push_back(container);
             }
-        });
-    let top_containers = stacks
-        .iter()
+            if let Some(container) = stacks[source - 1].pop_back() {
+                temp.push_front(container);
+            }
+        }
+        stacks[destination - 1].append(&mut temp);
+    });
+    let part_1 = stacks_part_1
+        .iter_mut()
         .filter_map(|stack| stack.back())
         .collect::<String>();
-    println!("{:#?}", top_containers);
+    let part_2 = stacks
+        .iter_mut()
+        .filter_map(|stack| stack.back())
+        .collect::<String>();
+    println!("{:#?}", part_1);
+    println!("{:#?}", part_2);
 }
