@@ -1,3 +1,4 @@
+#![feature(iter_array_chunks)]
 use std::cmp::Ordering;
 
 static CONTENTS: &str = include_str!("input.txt");
@@ -12,13 +13,10 @@ fn main() {
     for _ in 0..1000 {
         let (part_1, part_2) = CONTENTS
             .split_ascii_whitespace()
-            .map(|line| {
-                let v = line
-                    .split(",")
-                    .flat_map(|range| range.split("-"))
-                    .map(|s| s.parse::<u8>().unwrap())
-                    .collect::<Vec<_>>();
-                assert_eq!(v.len(), 4);
+            .flat_map(|line| line.split(",").flat_map(|range| range.split("-")))
+            .map(|bound| bound.parse::<u8>().unwrap())
+            .array_chunks::<4>()
+            .map(|v| {
                 if v[1] < v[2] || v[0] > v[3] {
                     RangeOverlap::None
                 } else {
