@@ -1,5 +1,3 @@
-#![feature(iter_array_chunks)]
-use regex::Regex;
 use std::cmp::Ordering;
 
 static CONTENTS: &str = include_str!("input.txt");
@@ -11,7 +9,6 @@ enum RangeOverlap {
 }
 
 fn main() {
-    // let rg = Regex::new(r"^(\d+)-(\d+),(\d+)-(\d+)$").unwrap();
     for _ in 0..1000 {
         let (part_1, part_2) = CONTENTS
             .split_ascii_whitespace()
