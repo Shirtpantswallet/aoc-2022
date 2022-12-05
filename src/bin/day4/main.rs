@@ -13,7 +13,7 @@ fn main() {
     let (part_1, part_2) = CONTENTS
         .split_ascii_whitespace()
         .flat_map(|line| line.split(",").flat_map(|range| range.split("-")))
-        .map(|bound| bound.parse::<u8>().unwrap())
+        .map(|bound| bound.parse::<usize>().unwrap())
         .array_chunks::<4>()
         .map(|v| {
             if v[1] < v[2] || v[0] > v[3] {
