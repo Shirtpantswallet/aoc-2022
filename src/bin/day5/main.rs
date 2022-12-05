@@ -34,8 +34,14 @@ fn main() {
                 v[idx].push_front(character);
             }
             v
-        });
-    println!("{:?}", stacks);
+        })
+        .iter()
+        .map(|v| Into::into(v.clone()))
+        .collect::<Vec<Vec<char>>>();
+    // for element in stacks.iter_mut() {
+    //     let new_element: Vec<char> = *element.into::<Vec<char>>();
+    //     new_element.reverse();
+    // }
 
     // Although the instructions are the same for parts 1 and 2,
     // the interpretation is different for each. At least we can
@@ -54,31 +60,29 @@ fn main() {
     let mut stacks_part_1 = stacks.clone();
 
     instructions.for_each(|[count, source, destination]| {
-        let mut temp = VecDeque::new();
-        // I tried drain(count..) as an alternative, but it panics a lot
-        // let mut fofi_containers = stacks_part_1[source - 1].drain(count..).collect();
-        // stacks_part_1[destination - 1].append(&mut fofi_containers);
+        // Although we're only looking at the length of stacks_part_1[source-1], because
+        // both parts 1 and 2 begin with the same container arrangement, and use the same
+        // instructions, the actual count of containers will be the same, even though the
+        // order is reversed.
+        let actual_count = stacks_part_1[source - 1].len().saturating_sub(count);
+        let mut fofi_containers = stacks_part_1[source - 1]
+            .drain(actual_count..)
+            .collect::<Vec<char>>();
+        fofi_containers.reverse();
+        stacks_part_1[destination - 1].append(&mut fofi_containers);
 
-        // let mut same_order_containers = stacks[source - 1].drain(count..).collect();
-        // stacks[destination - 1].append(&mut same_order_containers);
-
-        for _ in 0..count {
-            if let Some(container) = stacks_part_1[source - 1].pop_back() {
-                stacks_part_1[destination - 1].push_back(container);
-            }
-            if let Some(container) = stacks[source - 1].pop_back() {
-                temp.push_front(container);
-            }
-        }
-        stacks[destination - 1].append(&mut temp);
+        let mut same_order_containers = stacks[source - 1]
+            .drain(actual_count..)
+            .collect::<Vec<char>>();
+        stacks[destination - 1].append(&mut same_order_containers);
     });
     let part_1 = stacks_part_1
         .iter_mut()
-        .filter_map(|stack| stack.back())
+        .filter_map(|stack| stack.pop())
         .collect::<String>();
     let part_2 = stacks
         .iter_mut()
-        .filter_map(|stack| stack.back())
+        .filter_map(|stack| stack.pop())
         .collect::<String>();
     println!("{:#?}", part_1);
     println!("{:#?}", part_2);
