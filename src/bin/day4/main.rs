@@ -27,12 +27,9 @@ fn main() {
                 RangeOverlap::None // fully disjoint
             } else {
                 match (v[0].cmp(&v[2]), v[1].cmp(&v[3])) {
-                    (Ordering::Equal, _) => RangeOverlap::Contained,
-                    (_, Ordering::Equal) => RangeOverlap::Contained,
                     (Ordering::Greater, Ordering::Greater) => RangeOverlap::Intersection,
                     (Ordering::Less, Ordering::Less) => RangeOverlap::Intersection,
-                    (Ordering::Less, _) => RangeOverlap::Contained,
-                    (Ordering::Greater, _) => RangeOverlap::Contained,
+                    (_, _) => RangeOverlap::Contained,
                 }
             }
         })
