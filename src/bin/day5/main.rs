@@ -34,10 +34,10 @@ fn main() {
                 v[idx].push_front(character);
             }
             v
-        })
-        .iter()
-        .map(|v| Into::into(v.clone()))
-        .collect::<Vec<Vec<char>>>();
+        });
+    // .iter()
+    // .map(|v| Into::into(v.clone()))
+    // .collect::<Vec<Vec<char>>>();
     // for element in stacks.iter_mut() {
     //     let new_element: Vec<char> = *element.into::<Vec<char>>();
     //     new_element.reverse();
@@ -61,28 +61,28 @@ fn main() {
 
     instructions.for_each(|[count, source, destination]| {
         // Although we're only looking at the length of stacks_part_1[source-1], because
-        // both parts 1 and 2 begin with the same container arrangement, and use the same
-        // instructions, the actual count of containers will be the same, even though the
-        // order is reversed.
+        // both parts 1 and 2 begin with the same container arrangement and use the same
+        // instructions, the actual count of containers will be the same
         let actual_count = stacks_part_1[source - 1].len().saturating_sub(count);
+
         let mut fofi_containers = stacks_part_1[source - 1]
             .drain(actual_count..)
             .collect::<Vec<char>>();
         fofi_containers.reverse();
-        stacks_part_1[destination - 1].append(&mut fofi_containers);
+        stacks_part_1[destination - 1].append(&mut fofi_containers.into());
 
-        let mut same_order_containers = stacks[source - 1]
+        let same_order_containers = stacks[source - 1]
             .drain(actual_count..)
             .collect::<Vec<char>>();
-        stacks[destination - 1].append(&mut same_order_containers);
+        stacks[destination - 1].append(&mut same_order_containers.into());
     });
     let part_1 = stacks_part_1
         .iter_mut()
-        .filter_map(|stack| stack.pop())
+        .filter_map(|stack| stack.back())
         .collect::<String>();
     let part_2 = stacks
         .iter_mut()
-        .filter_map(|stack| stack.pop())
+        .filter_map(|stack| stack.back())
         .collect::<String>();
     println!("{:#?}", part_1);
     println!("{:#?}", part_2);
