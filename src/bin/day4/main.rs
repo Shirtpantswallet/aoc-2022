@@ -1,7 +1,6 @@
 #![feature(iter_array_chunks)]
 use regex::Regex;
 use std::cmp::Ordering;
-use std::collections::HashSet;
 
 static CONTENTS: &str = include_str!("input.txt");
 
