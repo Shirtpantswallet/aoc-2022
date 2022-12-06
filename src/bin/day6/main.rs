@@ -5,28 +5,26 @@ pub fn find_index(input: &str, length: usize) -> Option<usize> {
         return None;
     }
     let input = input.as_bytes();
-    let mut slow = 0;
-    'outer: while slow < input.len() - length {
+    'outer: for slow in 0..(input.len() - length) {
         let mut bitarray: usize = 0;
-        let mut fast = slow;
-        while fast - slow < length {
+        for fast in slow..(slow + length) {
             if (bitarray & 1 << (input[fast] - 'a' as u8) as usize) != 0 {
-                // Now we know there is a collision, so let's backtrack to skip forward!
-                while input[slow] != input[fast] {
-                    // Unset the keys between slow..collision
-                    bitarray ^= 1 << (input[slow] - 'a' as u8);
-                    slow += 1;
-                }
-                // Begin next loop with collision+1
-                slow += 1;
+                // Collisions always happen with with input[slow]
                 continue 'outer;
             }
             bitarray ^= 1 << (input[fast] - 'a' as u8);
-            fast += 1;
         }
         return Some(slow + length);
     }
     None
+    // Now we know there is a collision, so let's backtrack to skip forward!
+    // while input[slow] != input[fast] {
+    //     // Unset the keys between slow..collision
+    //     bitarray ^= 1 << (input[slow] - 'a' as u8);
+    //     slow += 1;
+    // }
+    // // Begin next loop with collision+1
+    // slow += 1;
 }
 
 fn main() {
