@@ -6,35 +6,23 @@ pub fn find_index(input: &str, length: usize) -> Option<usize> {
     }
     let input = input.as_bytes();
     let mut index = 0;
-    while index < input.len() - length {
-        if let CollisionResult::SkipTo(stride) = find_collision(&input[index..(index + length)]) {
-            index += stride + 1;
-        } else {
-            return Some(index + length);
-        }
-    }
-    None
-}
-
-pub enum CollisionResult {
-    Unique,
-    SkipTo(usize),
-}
-
-pub fn find_collision(input: &[u8]) -> CollisionResult {
-    let mut bitarray: usize = 0;
-    for pointer in 0..input.len() {
-        if (bitarray & 1 << (input[pointer] - 'a' as u8) as usize) != 0 {
-            // Now we know there is a collision, so let's backtrack to skip forward!
-            for backtracker in 0..pointer {
-                if (input[backtracker] & input[pointer]) != 0 {
-                    return CollisionResult::SkipTo(backtracker);
+    'outer: while index < input.len() - length {
+        let mut bitarray: usize = 0;
+        for pointer in index..(index + length) {
+            if (bitarray & 1 << (input[pointer] - 'a' as u8) as usize) != 0 {
+                // Now we know there is a collision, so let's backtrack to skip forward!
+                for backtracker in index..pointer {
+                    if (input[backtracker] & input[pointer]) != 0 {
+                        index += 1;
+                        continue 'outer;
+                    }
                 }
             }
+            bitarray ^= 1 << (input[pointer] - 'a' as u8);
         }
-        bitarray ^= 1 << (input[pointer] - 'a' as u8);
+        return Some(index + length);
     }
-    CollisionResult::Unique
+    None
 }
 
 fn main() {
