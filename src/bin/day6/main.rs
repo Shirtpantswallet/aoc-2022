@@ -9,11 +9,16 @@ pub fn find_index(input: &str, length: usize) -> Option<usize> {
     let mut collider = start;
     let mut bitarray: usize = 0;
     'outer: while start < (input.len() - length) {
-        'inner: while collider < start + length {
+        while collider < start + length {
+            // Detect collision
             if (bitarray & 1 << (input[collider] - 'a' as u8) as usize) != 0 {
                 let mut scout = collider + 1;
 
                 //// Shout out to @Akronymus for this idea!
+                // In the case that there are consecutive duplicate values,
+                // we can jump ahead and begin from the last of the duplicate
+                // values. We need to invalidate our bitarray when we do this.
+                ////
                 if scout < input.len() && input[collider] == input[scout] {
                     while scout < input.len() && input[collider] == input[scout] {
                         println!("{scout}");
@@ -30,28 +35,22 @@ pub fn find_index(input: &str, length: usize) -> Option<usize> {
                     bitarray ^= 1 << (input[start] - 'a' as u8);
                     start += 1;
                 }
+
+                // Always handle the default case;
                 bitarray ^= 1 << (input[start] - 'a' as u8);
                 start += 1;
-                collider = std::cmp::max(start, collider);
                 continue 'outer;
+            } else {
+                // No collision; update our array.
+                bitarray ^= 1 << (input[collider] - 'a' as u8);
+                if bitarray.count_ones() == length as u32 {
+                    return Some(start + length);
+                }
+                collider += 1;
             }
-            bitarray ^= 1 << (input[collider] - 'a' as u8);
-            if bitarray.count_ones() == length as u32 {
-                break 'inner;
-            }
-            collider += 1;
         }
-        return Some(start + length);
     }
     None
-    // Now we know there is a collision, so let's backtrack to skip forward!
-    // while input[slow] != input[fast] {
-    //     // Unset the keys between slow..collision
-    //     bitarray ^= 1 << (input[slow] - 'a' as u8);
-    //     slow += 1;
-    // }
-    // // Begin next loop with collision+1
-    // slow += 1;
 }
 
 fn main() {
