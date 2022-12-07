@@ -5,16 +5,43 @@ pub fn find_index(input: &str, length: usize) -> Option<usize> {
         return None;
     }
     let input = input.as_bytes();
-    'outer: for slow in 0..(input.len() - length) {
-        let mut bitarray: usize = 0;
-        for fast in slow..(slow + length) {
-            if (bitarray & 1 << (input[fast] - 'a' as u8) as usize) != 0 {
-                // Collisions always happen with with input[slow]
+    let mut start = 0;
+    let mut collider = start;
+    let mut bitarray: usize = 0;
+    'outer: while start < (input.len() - length) {
+        'inner: while collider < start + length {
+            if (bitarray & 1 << (input[collider] - 'a' as u8) as usize) != 0 {
+                let mut scout = collider + 1;
+
+                //// Shout out to @Akronymus for this idea!
+                if scout < input.len() && input[collider] == input[scout] {
+                    while scout < input.len() && input[collider] == input[scout] {
+                        println!("{scout}");
+                        scout += 1;
+                    }
+                    bitarray = 0;
+                    start = scout - 1;
+                    collider = start;
+                    continue 'outer;
+                }
+
+                // Bring the tail up faster!
+                while input[start] != input[collider] {
+                    bitarray ^= 1 << (input[start] - 'a' as u8);
+                    start += 1;
+                }
+                bitarray ^= 1 << (input[start] - 'a' as u8);
+                start += 1;
+                collider = std::cmp::max(start, collider);
                 continue 'outer;
             }
-            bitarray ^= 1 << (input[fast] - 'a' as u8);
+            bitarray ^= 1 << (input[collider] - 'a' as u8);
+            if bitarray.count_ones() == length as u32 {
+                break 'inner;
+            }
+            collider += 1;
         }
-        return Some(slow + length);
+        return Some(start + length);
     }
     None
     // Now we know there is a collision, so let's backtrack to skip forward!
